@@ -77,9 +77,27 @@ def current_datetime_str() -> str:
     """
     return datetime.utcnow().strftime("%d_%b_%Y_%H_%M_%S-UTC")
 
+def clean_url(url:str) -> str:
+    """Remove zero width spaces, leading/trailing whitespaces, trailing slashes, 
+    and URL prefixes from a URL
+
+    Args:
+        url (str): URL
+
+    Returns:
+        str: URL without zero width spaces, leading/trailing whitespaces, trailing slashes, 
+    and URL prefixes
+    """
+    removed_zero_width_spaces = re.sub(r'[\u200B-\u200D\uFEFF]','',url)
+    removed_leading_and_trailing_whitespaces = removed_zero_width_spaces.strip()
+    removed_trailing_slashes = removed_leading_and_trailing_whitespaces.rstrip("/")
+    removed_https = re.sub(r"^[Hh][Tt][Tt][Pp][Ss]:\/\/", "", removed_trailing_slashes)
+    removed_http = re.sub(r"^[Hh][Tt][Tt][Pp]:\/\/", "", removed_https)
+
+    return removed_http
 
 async def extract_urls() -> set[tuple[str,str]]:
-    """Extracts URLs found at https://urlsec.qq.com/cgi/risk/getList
+    """Extract URLs found at https://urlsec.qq.com/cgi/risk/getList
 
     Returns:
         set[str]: Unique URLs and their `evilclass`
@@ -88,7 +106,7 @@ async def extract_urls() -> set[tuple[str,str]]:
         endpoint: str = "https://urlsec.qq.com/cgi/risk/getList"
         raw = json.loads((await get_async([endpoint]))[endpoint])
         urls_and_evilclasses: set[tuple[str,str]] = set(
-                (re.sub(r'[\u200B-\u200D\uFEFF]','',x.get("src_url","")),
+                (clean_url(x.get("src_url","")),
                 x.get("evilclass","")) for x in raw.get("data",{})
                 if x.get("src_url","") != ""
             )
