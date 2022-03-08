@@ -4,7 +4,7 @@
 ![AIOHTTP](https://img.shields.io/badge/AIOHTTP-2C5BB4?style=for-the-badge&logo=aiohttp&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-[![GitHub license](https://img.shields.io/badge/LICENSE-BSD--3--CLAUSE-GREEN?style=for-the-badge)](https://github.com/elliotwutingfeng/QQURLSec/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/badge/LICENSE-BSD--3--CLAUSE-GREEN?style=for-the-badge)](LICENSE)
 [![scraper](https://img.shields.io/github/workflow/status/elliotwutingfeng/QQURLSec/scraper?label=SCRAPER&style=for-the-badge)](https://github.com/elliotwutingfeng/QQURLSec/actions/workflows/scraper.yml)
 
 Tencent QQ has an undocumented publicly-accessible [real-time feed](https://urlsec.qq.com/cgi/risk/getList) of malicious URLs.
