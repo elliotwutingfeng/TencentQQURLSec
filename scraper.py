@@ -1,33 +1,35 @@
-"""Extracts URLs found at https://urlsec.qq.com/cgi/risk/getList and writes them to a 
+"""Extracts URLs found at https://urlsec.qq.com/cgi/risk/getList and writes them to a
 .txt blocklist
 """
 import asyncio
 import json
-import re
-from datetime import datetime
 import logging
+import re
 import socket
+from datetime import datetime
 
 import aiohttp
 
-
 logger = logging.getLogger()
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 default_headers: dict = {
-'Content-Type': 'application/json',
-'Connection': 'keep-alive',
-'Cache-Control':'no-cache',
-'Accept': '*/*'}
+    "Content-Type": "application/json",
+    "Connection": "keep-alive",
+    "Cache-Control": "no-cache",
+    "Accept": "*/*",
+}
+
 
 class KeepAliveClientRequest(aiohttp.client_reqrep.ClientRequest):
     """Attempt to prevent `Response payload is not completed` error
-    
+
     https://github.com/aio-libs/aiohttp/issues/3904#issuecomment-759205696
 
 
     """
+
     async def send(self, conn):
         """Send keep-alive TCP probes"""
         sock = conn.protocol.transport.get_extra_info("socket")
@@ -36,9 +38,10 @@ class KeepAliveClientRequest(aiohttp.client_reqrep.ClientRequest):
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 2)
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)
 
-        return (await super().send(conn))
+        return await super().send(conn)
 
-async def backoff_delay_async(backoff_factor: float,number_of_retries_made: int) -> None:
+
+async def backoff_delay_async(backoff_factor: float, number_of_retries_made: int) -> None:
     """Asynchronous time delay that exponentially increases with `number_of_retries_made`
 
     Args:
@@ -47,12 +50,16 @@ async def backoff_delay_async(backoff_factor: float,number_of_retries_made: int)
     """
     await asyncio.sleep(backoff_factor * (2 ** (number_of_retries_made - 1)))
 
-async def get_async(endpoints: list[str], max_concurrent_requests: int = 5, headers: dict = None) -> dict[str,bytes]:
+
+async def get_async(
+    endpoints: list[str], max_concurrent_requests: int = 5, headers: dict = None
+) -> dict[str, bytes]:
     """Given a list of HTTP endpoints, make HTTP GET requests asynchronously
 
     Args:
         endpoints (list[str]): List of HTTP GET request endpoints
-        max_concurrent_requests (int, optional): Maximum number of concurrent async HTTP requests. Defaults to 5.
+        max_concurrent_requests (int, optional): Maximum number of concurrent async HTTP requests.
+        Defaults to 5.
         headers (dict, optional): HTTP Headers to send with every request. Defaults to None.
 
     Returns:
@@ -62,7 +69,7 @@ async def get_async(endpoints: list[str], max_concurrent_requests: int = 5, head
     if headers is None:
         headers = default_headers
 
-    async def gather_with_concurrency(max_concurrent_requests: int, *tasks) -> dict[str,bytes]:
+    async def gather_with_concurrency(max_concurrent_requests: int, *tasks) -> dict[str, bytes]:
         semaphore = asyncio.Semaphore(max_concurrent_requests)
 
         async def sem_task(task):
@@ -79,20 +86,27 @@ async def get_async(endpoints: list[str], max_concurrent_requests: int = 5, head
         for number_of_retries_made in range(max_retries):
             try:
                 async with session.get(url, headers=headers) as response:
-                    return (url,await response.read())
+                    return (url, await response.read())
             except Exception as error:
                 errors.append(repr(error))
                 logger.warning("%s | Attempt %d failed", error, number_of_retries_made + 1)
-                if number_of_retries_made != max_retries - 1: # No delay if final attempt fails
+                if number_of_retries_made != max_retries - 1:  # No delay if final attempt fails
                     await backoff_delay_async(1, number_of_retries_made)
         logger.error("URL: %s GET request failed! Errors: %s", url, errors)
-        return (url,b"{}") # Allow json.loads to parse body if request fails 
+        return (url, b"{}")  # Allow json.loads to parse body if request fails
 
     # GET request timeout of 5 minutes (300 seconds)
-    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=0, ttl_dns_cache=300),
-     raise_for_status=True, timeout=aiohttp.ClientTimeout(total=300), request_class=KeepAliveClientRequest) as session:
+    async with aiohttp.ClientSession(
+        connector=aiohttp.TCPConnector(limit=0, ttl_dns_cache=300),
+        raise_for_status=True,
+        timeout=aiohttp.ClientTimeout(total=300),
+        request_class=KeepAliveClientRequest,
+    ) as session:
         # Only one instance of any duplicate endpoint will be used
-        return await gather_with_concurrency(max_concurrent_requests, *[get(url, session) for url in set(endpoints)])
+        return await gather_with_concurrency(
+            max_concurrent_requests, *[get(url, session) for url in set(endpoints)]
+        )
+
 
 def current_datetime_str() -> str:
     """Current time's datetime string in UTC.
@@ -102,18 +116,19 @@ def current_datetime_str() -> str:
     """
     return datetime.utcnow().strftime("%d_%b_%Y_%H_%M_%S-UTC")
 
-def clean_url(url:str) -> str:
-    """Remove zero width spaces, leading/trailing whitespaces, trailing slashes, 
+
+def clean_url(url: str) -> str:
+    """Remove zero width spaces, leading/trailing whitespaces, trailing slashes,
     and URL prefixes from a URL
 
     Args:
         url (str): URL
 
     Returns:
-        str: URL without zero width spaces, leading/trailing whitespaces, trailing slashes, 
+        str: URL without zero width spaces, leading/trailing whitespaces, trailing slashes,
     and URL prefixes
     """
-    removed_zero_width_spaces = re.sub(r'[\u200B-\u200D\uFEFF]','',url)
+    removed_zero_width_spaces = re.sub(r"[\u200B-\u200D\uFEFF]", "", url)
     removed_leading_and_trailing_whitespaces = removed_zero_width_spaces.strip()
     removed_trailing_slashes = removed_leading_and_trailing_whitespaces.rstrip("/")
     removed_https = re.sub(r"^[Hh][Tt][Tt][Pp][Ss]:\/\/", "", removed_trailing_slashes)
@@ -121,7 +136,8 @@ def clean_url(url:str) -> str:
 
     return removed_http
 
-async def extract_urls() -> set[tuple[str,str]]:
+
+async def extract_urls() -> set[tuple[str, str]]:
     """Extract URLs found at https://urlsec.qq.com/cgi/risk/getList
 
     Returns:
@@ -130,28 +146,34 @@ async def extract_urls() -> set[tuple[str,str]]:
     try:
         endpoint: str = "https://urlsec.qq.com/cgi/risk/getList"
         raw = json.loads((await get_async([endpoint]))[endpoint])
-        urls_and_evilclasses: set[tuple[str,str]] = set(
-                (clean_url(x.get("src_url","")),
-                x.get("evilclass","")) for x in raw.get("data",{})
-                if x.get("src_url","") != ""
-            )
+        urls_and_evilclasses: set[tuple[str, str]] = set(
+            (clean_url(x.get("src_url", "")), x.get("evilclass", ""))
+            for x in raw.get("data", {})
+            if x.get("src_url", "") != ""
+        )
         return urls_and_evilclasses
     except Exception as error:
         logger.error(error)
         return set()
 
-if __name__=='__main__':
-    urls_and_evilclasses: set[tuple[str,str]] = asyncio.get_event_loop().run_until_complete(extract_urls())
+
+if __name__ == "__main__":
+    urls_and_evilclasses: set[tuple[str, str]] = asyncio.get_event_loop().run_until_complete(
+        extract_urls()
+    )
     if urls_and_evilclasses:
         timestamp: str = current_datetime_str()
         filename = "blocklist.txt"
-        with open(filename,'w') as f:
+        with open(filename, "w") as f:
             # Get rid of zero width spaces
 
-            f.writelines('\n'.join(
-                f"{url} # {evilclass}" for (url,evilclass) in sorted(urls_and_evilclasses)
+            f.writelines(
+                "\n".join(
+                    f"{url} # {evilclass}" for (url, evilclass) in sorted(urls_and_evilclasses)
                 )
-                    )
-            logger.info("%d URLs written to %s at %s", len(urls_and_evilclasses), filename, timestamp)
+            )
+            logger.info(
+                "%d URLs written to %s at %s", len(urls_and_evilclasses), filename, timestamp
+            )
     else:
         raise ValueError("URL extraction failed")
