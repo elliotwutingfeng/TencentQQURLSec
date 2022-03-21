@@ -158,9 +158,7 @@ async def extract_urls() -> set[tuple[str, str]]:
 
 
 if __name__ == "__main__":
-    urls_and_evilclasses: set[tuple[str, str]] = asyncio.get_event_loop().run_until_complete(
-        extract_urls()
-    )
+    urls_and_evilclasses: set[tuple[str, str]] = asyncio.run(extract_urls())
     if urls_and_evilclasses:
         timestamp: str = current_datetime_str()
         filename = "blocklist.txt"
