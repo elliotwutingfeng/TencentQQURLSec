@@ -6,7 +6,7 @@ on:
         - cron: "*/5 * * * *" # runs every fifth minute
 
 jobs:
-    build:
+    generate_list:
         runs-on: ubuntu-latest
         steps:
             - name: checkout repo content
