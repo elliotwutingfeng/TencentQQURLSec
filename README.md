@@ -17,9 +17,14 @@ The URLs in this blocklist are compiled by **Tencent QQ**.
 **Disclaimer:** _This project is not sponsored, endorsed, or otherwise affiliated with Tencent._
 
 ## Blocklist download
-You may download the blocklist [here](blocklist.txt?raw=1)
+
+| File | Download |
+|:-:|:-:|
+| blocklist.txt | [:floppy_disk:](blocklist.txt?raw=true) |
+| blocklist_ABP.txt | [:floppy_disk:](blocklist_ABP.txt?raw=true) |
 
 ## Threat categories
+
 Each URL is numerically categorised by threat type with the parameter `evilclass`. The `evilclass` number for each URL is provided in the blocklist after the `#` symbol.
 
 Translations are provided as-follows
@@ -45,7 +50,7 @@ More information (in chinese) on the parameter `evilclass` can be found at
 
 ## Requirements
 
--   Python >= 3.9.10
+-   Python >= 3.10.5
 
 ## Setup instructions
 
