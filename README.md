@@ -6,7 +6,7 @@
 
 [![GitHub license](https://img.shields.io/badge/LICENSE-BSD--3--CLAUSE-GREEN?style=for-the-badge)](LICENSE)
 [![scraper](https://img.shields.io/github/workflow/status/elliotwutingfeng/TencentQQURLSec/scraper?label=SCRAPER&style=for-the-badge)](https://github.com/elliotwutingfeng/TencentQQURLSec/actions/workflows/scraper.yml)
-<img src="https://img.shields.io/tokei/lines/github/elliotwutingfeng/TencentQQURLSec?label=Total%20Blocklist%20URLS&style=for-the-badge" alt="Total Blocklist URLs"/>
+<img src="https://tokei-rs.onrender.com/b1/github/elliotwutingfeng/TencentQQURLSec?label=Total%20Blocklist%20URLS&style=for-the-badge" alt="Total Blocklist URLs"/>
 
 Tencent QQ has an undocumented publicly-accessible [real-time feed](https://urlsec.qq.com/cgi/risk/getList) of malicious URLs.
 
