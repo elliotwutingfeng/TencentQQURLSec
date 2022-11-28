@@ -22,6 +22,7 @@ The URLs in this blocklist are compiled by **Tencent QQ**.
 |:-:|:-:|
 | blocklist.txt | [:floppy_disk:](blocklist.txt?raw=true) |
 | blocklist_ABP.txt | [:floppy_disk:](blocklist_ABP.txt?raw=true) |
+| blocklist_UBO.txt | [:floppy_disk:](blocklist_UBO.txt?raw=true) |
 
 ## Threat categories
 
@@ -50,7 +51,7 @@ More information (in chinese) on the parameter `evilclass` can be found at
 
 ## Requirements
 
--   Python >= 3.10.5
+-   Python >= 3.11
 
 ## Setup instructions
 
