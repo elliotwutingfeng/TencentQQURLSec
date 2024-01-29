@@ -58,13 +58,15 @@ More information (in chinese) on the parameter `evilclass` can be found at
 `git clone` and `cd` into the project directory, then run the following
 
 ```bash
-pip3 install -r requirements.txt
+python3 -m venv venv
+venv/bin/python3 -m pip install --upgrade pip
+venv/bin/python3 -m pip install -r requirements.txt
 ```
 
 ## Usage
 
 ```bash
-python3 scraper.py
+venv/bin/python3 scraper.py
 ```
 
 &nbsp;
