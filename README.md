@@ -29,29 +29,29 @@ The URLs in this blocklist are compiled by **Tencent QQ**.
 Each URL is numerically categorised by threat type with the parameter `evilclass`. The `evilclass` number for each URL is provided in the blocklist after the `#` symbol.
 
 Translations are provided as-follows
-```
+
+```python
 # evilclass
 {
-	'1' : '社工欺诈', # Phishing
-	'2' : '信息诈骗', # Scam
-	'3' : '虚假广告', # False Advertising
-	'4' : '恶意文件', # Malicious Files
-	'5' : '博彩网站', # Gambling
-	'6' : '色情内容', # Pornographic content
-	'7' : '垃圾信息', # Spam
-	'8' : '非法内容' # Illegal content (likely to contain politically censored websites)
+ '1' : '社工欺诈', # Phishing
+ '2' : '信息诈骗', # Scam
+ '3' : '虚假广告', # False Advertising
+ '4' : '恶意文件', # Malicious Files
+ '5' : '博彩网站', # Gambling
+ '6' : '色情内容', # Pornographic content
+ '7' : '垃圾信息', # Spam
+ '8' : '非法内容' # Illegal content (likely to contain politically censored websites)
 }
 ```
+
 Source: `https://github.com/flowerdown/tencent_url_safe_dump/blob/master/tencent_Dangerous_web.py`
 
 More information (in chinese) on the parameter `evilclass` can be found at
 `https://urlsec.qq.com/eviltype.html` and `https://urlsec.qq.com/wiki/#!md/SafeQueryHttp.md`
 
-
-
 ## Requirements
 
--   Python >= 3.11
+- Python 3.12+
 
 ## Setup instructions
 
