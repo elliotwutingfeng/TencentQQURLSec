@@ -1,4 +1,4 @@
-aiohttp==3.12.14
+aiohttp==3.12.15
 bandit==1.8.3
 black==24.10.0
 more-itertools==10.7.0
